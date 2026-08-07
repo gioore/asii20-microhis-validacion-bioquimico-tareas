@@ -29,7 +29,7 @@ bio --> UC08
 
 UC03 ..> UC02 : include
 UC04 ..> UC02 : include
-UC03 ..> UC05 : extend
+UC05 ..> UC03 : extend
 
 UC03 ..> med : resultado validado\ndisponible en EMR
 UC04 ..> tec : notificación\nde rechazo
