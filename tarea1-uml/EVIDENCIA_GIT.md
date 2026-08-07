@@ -9,12 +9,14 @@
 
 ```
 tarea1-uml/
-├── portada.md              # Portada del documento
+├── portada.md              # Documento fuente (portada + índice + intro + desarrollo + conclusión + bibliografía)
+├── tarea1-uml.docx/.pdf    # Documento entregable exportado
 ├── casos-de-uso.puml/.png  # Diagrama de casos de uso
 ├── actividad.puml/.png     # Diagrama de actividad
 ├── secuencia.puml/.png     # Diagrama de secuencia
 ├── matriz-trazabilidad.md  # Matriz requisito → diagrama → elemento
 ├── DECLARACION_IA.md       # Declaración de uso de IA (con prompts)
+├── defensa-oral.md         # Guía breve para la defensa oral
 └── EVIDENCIA_GIT.md        # Este archivo
 ```
 
@@ -39,4 +41,4 @@ ccf9c30 tarea1: add AI declaration and git evidence
 ## Notas
 
 - Cada diagrama se genera desde su fuente editable `.puml` (reproducible).
-- El pendiente para el cierre de la tarea (subir mañana): sección Introducción y Conclusión del documento y su exportación a PDF/DOCX.
+- El documento entregable está disponible como `tarea1-uml.pdf` y `tarea1-uml.docx`, con portada, índice, introducción, desarrollo, conclusión y bibliografía.
