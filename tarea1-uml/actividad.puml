@@ -1,0 +1,36 @@
+@startuml
+start
+:Batalla consulta resultados pendientes;
+
+if (¿Existen resultados sin validar?) then (Sí)
+  :Selecciona un resultado;
+  :Revisa valor vs rangos\nde referencia;
+else (No)
+  :Muestra "sin resultados\npendientes";
+  stop
+endif
+
+if (¿Valor crítico?) then (Sí)
+  :Confirmar criticalidad\ny generar alerta;
+elseif (¿Valor anormal?) then (Sí)
+  :Marca como anormal;
+endif
+
+if (¿Se aprueba el resultado?) then (Sí)
+  :Validar\n(validated_by, validated_at);
+  :Item -> resultado_listo;
+else (no / rechazo)
+  if (¿Motivo obligatorio\nproporcionado?) then (Sí)
+    :Rechazar y notificar\nal técnico;
+  else (No)
+    :Error: motivo\nobligatorio;
+  endif
+endif
+
+if (¿Hay más pendientes?) then (Sí)
+  :Volver a revisión\ndel siguiente;
+  :Selecciona un resultado;
+else (No)
+  stop
+endif
+@enduml

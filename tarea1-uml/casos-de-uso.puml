@@ -1,0 +1,38 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Bioquímico" as bio
+actor "Técnico de\nLaboratorio" as tec
+actor "Médico" as med
+actor "Sistema de\nAlertas" as alertas
+
+rectangle "Validación de Resultados de Laboratorio" {
+  usecase "CU-01: Ver resultados\npendientes de revisión" as UC01
+  usecase "CU-02: Ver detalle del\nresultado con rangos" as UC02
+  usecase "CU-03: Validar\nresultado" as UC03
+  usecase "CU-04: Rechazar\nresultado (motivo)" as UC04
+  usecase "CU-05: Confirmar\nvalor crítico" as UC05
+  usecase "CU-06: Consultar\nhistorial de validaciones" as UC06
+  usecase "CU-07: Revisar resultado\ncorregido" as UC07
+  usecase "CU-08: Revalidar\nresultado corregido" as UC08
+}
+
+bio --> UC01
+bio --> UC02
+bio --> UC03
+bio --> UC04
+bio --> UC05
+bio --> UC06
+bio --> UC07
+bio --> UC08
+
+UC03 ..> UC02 : include
+UC04 ..> UC02 : include
+UC03 ..> UC05 : extend
+
+UC03 ..> med : resultado validado\ndisponible en EMR
+UC04 ..> tec : notificación\nde rechazo
+UC05 ..> alertas : generar alerta\ncrítica
+UC07 ..> tec : resultado\ncorregido
+@enduml

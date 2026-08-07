@@ -1,0 +1,51 @@
+@startuml
+actor "Bioquímico" as bio
+participant "Sistema (API)" as api
+participant "LabResult" as result
+participant "LabOrderItem" as item
+participant "CriticalAlert" as alert
+
+== Consulta de pendientes ==
+bio -> api : GET /lab/results/pending
+api -> api : Valida tenant + rol Bioquimico\n(permiso results.view)
+alt sin permiso
+    api --> bio : 403 Forbidden
+else permisos válidos
+    api -> result : buscar resultados\nsin validated_at
+    result --> api : lista pendiente
+    api --> bio : 200 lista (CU-01)
+end
+
+== Validación ==
+bio -> api : POST /lab/results/{id}/validate
+api -> result : verificar estado\n(no validado aún)
+alt ya validado
+    api --> bio : 409 Conflict
+else pendiente
+    api -> result : set validated_by,\nvalidated_at
+    api -> item : set status\nresultado_listo
+    alt valor crítico
+        api -> alert : crear critical_alert\n(patient_id, message)
+        alert --> api : ok
+        api --> bio : 200 validado + alerta
+    else normal
+        api --> bio : 200 validado
+    end
+end
+
+== Rechazo ==
+bio -> api : POST /lab/results/{id}/reject {motivo}
+api -> result : validar motivo no vacío
+alt motivo vacío
+    api --> bio : 422 Unprocessable
+else motivo ok
+    api -> result : marcar pendiente\n+ registrar motivo
+    api -> api : notificar técnico
+    api --> bio : 200 rechazado (CU-04)
+end
+
+== Revalidación ==
+bio -> api : POST /lab/results/{id}/validate
+api -> result : validar nuevamente (CU-08)
+api --> bio : 200 revalidado
+@enduml
