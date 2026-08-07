@@ -9,7 +9,7 @@
 | **GitHub** | `gioore` |
 | **Módulo oficial** | Validación de resultados por bioquímico |
 | **Consigna individual** | Modele el proceso «revisión, validación o rechazo de un resultado por bioquímico» |
-| **Repositorio** | https://github.com/gioore/asii20-microhis-validacion-bioquimico |
+| **Repositorio** | https://github.com/gioore/asii20-microhis-validacion-bioquimico-tareas |
 | **Rama evaluada** | `main` |
 | **Commit / etiqueta evaluada** | `tarea-1-entrega` |
 

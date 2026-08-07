@@ -2,6 +2,8 @@
 
 Repositorio personal de **GERSON GIOVANNI ORELLANA VÉLIZ** (`gioore`), módulo **ASII-20 — Validación de resultados por bioquímico**, para las tareas individuales de Análisis de Sistemas II 2026.
 
+**URL:** https://github.com/gioore/asii20-microhis-validacion-bioquimico-tareas
+
 > **Entrega evaluada por tarea (URL + rama + tag):**
 > - Tarea 1 — Diagramas UML por módulo: rama `main`, tag `tarea-1-entrega`
 > - Tarea 2 — SOLID (DIP): rama `main`, tag `tarea-2-entrega`
