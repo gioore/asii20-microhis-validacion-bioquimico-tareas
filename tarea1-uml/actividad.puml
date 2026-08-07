@@ -1,36 +1,55 @@
 @startuml
+title Validación de resultados por bioquímico
 start
-:Batalla consulta resultados pendientes;
+repeat
+  partition "Bioquímico" {
+    :Consultar resultados\npendientes de validación;
+    if (¿Existen resultados\nsin validar?) then (No)
+      :Mostrar "sin resultados\npendientes";
+      stop
+    else (Sí)
+      :Selecciona un resultado;
+    endif
+    :Revisa valor vs rangos\nde referencia;
+    if (¿Valor supera umbral\ncrítico?) then (Sí)
+      :Confirmar criticalidad\ny generar alerta;
+      note right
+        Regla de negocio: un valor
+        crítico no puede rechazarse
+        directamente; requiere
+        escalamiento.
+      end note
+    elseif (¿Valor fuera de rango)? then (Sí)
+      :Marca flag is_anormal;
+    endif
+    if (¿Se aprueba el\nresultado?) then (Sí)
+    else (No / Rechazo)
+      :Solicitar motivo\ndel rechazo;
+      if (¿Motivo\nproporcionado?) then (Sí)
+      else (No)
+        :Excepción: motivo\nobligatorio;
+        stop
+      endif
+    endif
+  }
 
-if (¿Existen resultados sin validar?) then (Sí)
-  :Selecciona un resultado;
-  :Revisa valor vs rangos\nde referencia;
-else (No)
-  :Muestra "sin resultados\npendientes";
-  stop
-endif
+  partition "Sistema" {
+    if (¿Se aprueba?) then (Sí)
+      :Registrar validación\n(validated_by, validated_at);
+      :Actualizar item a\nresultado_listo;
+      :Disponible en EMR\npara el médico;
+    else (motivo válido)
+      :Registrar rechazo\ny notify al técnico;
+    endif
+  }
 
-if (¿Valor crítico?) then (Sí)
-  :Confirmar criticalidad\ny generar alerta;
-elseif (¿Valor anormal?) then (Sí)
-  :Marca como anormal;
-endif
-
-if (¿Se aprueba el resultado?) then (Sí)
-  :Validar\n(validated_by, validated_at);
-  :Item -> resultado_listo;
-else (no / rechazo)
-  if (¿Motivo obligatorio\nproporcionado?) then (Sí)
-    :Rechazar y notificar\nal técnico;
-  else (No)
-    :Error: motivo\nobligatorio;
-  endif
-endif
-
-if (¿Hay más pendientes?) then (Sí)
-  :Volver a revisión\ndel siguiente;
-  :Selecciona un resultado;
-else (No)
-  stop
-endif
+  partition "Técnico de Laboratorio" {
+    if (¿Hubo rechazo?) then (Sí)
+      :Corrige el resultado;
+      :Volver a pendiente;
+    endif
+  }
+repeat while (¿Hay más resultados pendientes?) is (Sí)
+-> No;
+stop
 @enduml
