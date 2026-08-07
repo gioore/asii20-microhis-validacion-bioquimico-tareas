@@ -1,11 +1,14 @@
 @startuml
+title Validación de resultados por bioquímico — secuencia
 actor "Bioquímico" as bio
+actor "Técnico de Laboratorio" as tec
 participant "Sistema (API)" as api
 participant "LabResult" as result
 participant "LabOrderItem" as item
 participant "CriticalAlert" as alert
+participant "Médico" as med
 
-== Consulta de pendientes ==
+== CU-01 · Consulta de pendientes ==
 bio -> api : GET /lab/results/pending
 api -> api : Valida tenant + rol Bioquimico\n(permiso results.view)
 alt sin permiso
@@ -16,7 +19,7 @@ else permisos válidos
     api --> bio : 200 lista (CU-01)
 end
 
-== Validación ==
+== CU-03 · Validación ==
 bio -> api : POST /lab/results/{id}/validate
 api -> result : verificar estado\n(no validado aún)
 alt ya validado
@@ -24,27 +27,31 @@ alt ya validado
 else pendiente
     api -> result : set validated_by,\nvalidated_at
     api -> item : set status\nresultado_listo
-    alt valor crítico
+    alt valor crítico (CU-05)
         api -> alert : crear critical_alert\n(patient_id, message)
         alert --> api : ok
-        api --> bio : 200 validado + alerta
-    else normal
-        api --> bio : 200 validado
+        api --> med : notificar valor crítico
     end
+    api --> bio : 200 validado (CU-03)
 end
 
-== Rechazo ==
+== CU-04 · Rechazo ==
 bio -> api : POST /lab/results/{id}/reject {motivo}
 api -> result : validar motivo no vacío
 alt motivo vacío
     api --> bio : 422 Unprocessable
 else motivo ok
-    api -> result : marcar pendiente\n+ registrar motivo
-    api -> api : notificar técnico
-    api --> bio : 200 rechazado (CU-04)
+    api -> result : registrar rechazo\n(motivo + pendiente)
+    api --> tec : notificar rechazo (CU-04)
 end
 
-== Revalidación ==
+== CU-07 · Corrección del técnico ==
+tec -> api : POST /lab/results/{id}/correct\n{nuevo valor}
+api -> result : validar corrección\n(is_critical, is_anormal)
+api -> result : volver a pendiente
+api --> tec : 200 corregido
+
+== CU-08 · Revalidación ==
 bio -> api : POST /lab/results/{id}/validate
 api -> result : validar nuevamente (CU-08)
 api --> bio : 200 revalidado
