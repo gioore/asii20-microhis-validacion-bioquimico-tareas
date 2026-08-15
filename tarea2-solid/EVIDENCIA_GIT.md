@@ -22,7 +22,10 @@ tarea2-solid/
 ## Historial de commits
 
 ```
-_Se completa tras el push de esta tarea._
+08fcc5e tarea2: add AI declaration, oral defense guide and git evidence
+deb11ca tarea2: add final deliverable document with DIP citation and PHP before/after (DOCX + PDF)
+ec2ecf7 tarea2: add before/after DIP class diagrams (PlantUML + PNG)
+fbb09f4 tarea2: add RF/RNF and acceptance criteria for DIP design
 ```
 
 ## Notas
