@@ -1,0 +1,39 @@
+@startuml
+title ANTES: alto acoplamiento (viola DIP)
+
+class BioquimicoValidationService {
+  -mysql: MysqlLabResultRepository
+  -email: EmailCriticalAlertNotifier
+  -emr: EmrApiPublisher
+  +validar(remitido: LabResult): void
+  +rechazar(remitido: LabResult, motivo: string): void
+}
+
+class MysqlLabResultRepository {
+  +buscarPendientes(): array
+  +guardarValidacion(r: LabResult): void
+  +guardarRechazo(r: LabResult, motivo: string): void
+}
+
+class EmailCriticalAlertNotifier {
+  +emitir(paciente: string, mensaje: string): void
+}
+
+class EmrApiPublisher {
+  +publicarResultado(r: LabResult): void
+}
+
+class LabResult
+
+BioquimicoValidationService *-- MysqlLabResultRepository : "crea directamente"
+BioquimicoValidationService *-- EmailCriticalAlertNotifier : "crea directamente"
+BioquimicoValidationService *-- EmrApiPublisher : "crea directamente"
+BioquimicoValidationService ..> LabResult : "usa"
+
+note bottom of BioquimicoValidationService
+  Depende de implementaciones concretas:
+  cambiar persistencia o canal de alerta
+  obliga a modificar el servicio (alto acoplamiento).
+end note
+
+@enduml

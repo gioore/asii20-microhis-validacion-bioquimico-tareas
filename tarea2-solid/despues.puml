@@ -1,0 +1,46 @@
+@startuml
+title DESPUES: inversión de dependencias (DIP)
+
+interface LabResultRepository {
+  +buscarPendientes(): array
+  +guardarValidacion(r: LabResult): void
+  +guardarRechazo(r: LabResult, motivo: string): void
+}
+
+interface CriticalAlertNotifier {
+  +emitir(paciente: string, mensaje: string): void
+}
+
+interface EmrPublisher {
+  +publicarResultado(r: LabResult): void
+}
+
+class BioquimicoValidationService {
+  -repo: LabResultRepository
+  -alertas: CriticalAlertNotifier
+  -emr: EmrPublisher
+  +BioquimicoValidationService(repo, alertas, emr)
+  +validar(remitido: LabResult): void
+  +rechazar(remitido: LabResult, motivo: string): void
+}
+
+class MysqlLabResultRepository implements LabResultRepository
+class InMemoryLabResultRepository implements LabResultRepository
+class EmailCriticalAlertNotifier implements CriticalAlertNotifier
+class EmrApiPublisher implements EmrPublisher
+
+class LabResult
+
+BioquimicoValidationService --> LabResultRepository : "depende de abstracción"
+BioquimicoValidationService --> CriticalAlertNotifier : "depende de abstracción"
+BioquimicoValidationService --> EmrPublisher : "depende de abstracción"
+BioquimicoValidationService ..> LabResult : "usa"
+
+note bottom of BioquimicoValidationService
+  El alto nivel depende de interfaces.
+  Los detalles implementan las interfaces.
+  La persistencia y los canales son intercambiables
+  sin modificar el servicio (testabilidad).
+end note
+
+@enduml
