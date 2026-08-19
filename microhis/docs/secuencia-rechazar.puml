@@ -1,0 +1,28 @@
+@startuml
+title Micro-HIS ASII-20 — Secuencia rechazar resultado (CU-04)
+
+skinparam defaultFontSize 13
+
+actor Bioquimico
+participant "Presentation\n(public/index.php)" as pres
+participant "Application\nBioquimicoValidationService" as service
+participant "Domain\nLabResult" as entity
+participant "Persistence\nPdoLabResultRepository" as repo
+database "SQLite" as db
+participant "TecnicoNotifier" as tecnico
+
+Bioquimico -> pres : POST /lab/results/{id}/reject\n{reason: "Muestra hemolizada"}
+pres -> service : reject(id, reason, usuario, rol)
+service -> service : assertBioquimico(rol)
+service -> repo : findById(id)
+repo --> service : LabResult pendiente
+service -> entity : reject(reason, fecha)
+entity -> entity : assertValidRejectionReason() → 422 si vacío
+entity -> entity : assertRejectable() → 422 si crítico
+entity --> service : estado rechazado + motivo
+service -> repo : save(result)
+service -> tecnico : notifyRejection(result, reason)
+tecnico --> service : notificado
+service --> pres : 200 JSON (resultado)
+pres --> Bioquimico : respuesta JSON
+@enduml

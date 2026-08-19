@@ -1,0 +1,51 @@
+@startuml
+title Micro-HIS ASII-20 — Diagrama de capas
+
+skinparam componentStyle rectangle
+skinparam defaultFontSize 13
+
+package "Presentation" #FEF1D6 {
+  [public/index.php\n(Router HTTP + JSON)] as presentation_http
+  [bin/consola.php\n(CLI)] as presentation_cli
+}
+
+package "Application" #E8F0FE {
+  [BioquimicoValidationService\n(CU-03, CU-04, CU-05, CU-08)] as service
+  interface "CriticalAlertNotifier" as alert_iface
+  interface "TecnicoNotifier" as tecnico_iface
+  [LogCriticalAlertNotifier] as alert_impl
+  [LogTecnicoNotifier] as tecnico_impl
+}
+
+package "Domain" #E6F4E6 {
+  [LabResult\n(entidad + reglas)] as entity
+  [LabResultStatus] as status
+  [DomainException\n(422/403/404/409)] as exceptions
+}
+
+package "Persistence" #FBE4E4 {
+  interface "LabResultRepository" as repo_iface
+  [PdoLabResultRepository\n(PDO + sentencias preparadas)] as pdo_impl
+  [InMemoryLabResultRepository\n(doble para pruebas)] as inmem_impl
+  [FailingLabResultRepository\n(doble de error)] as fail_impl
+}
+
+database "SQLite\n(var/his.sqlite)" as db
+
+presentation_http --> service
+presentation_cli --> service
+
+service --> repo_iface
+service --> alert_iface
+service --> tecnico_iface
+
+alert_impl ..|> alert_iface
+tecnico_impl ..|> tecnico_iface
+pdo_impl ..|> repo_iface
+inmem_impl ..|> repo_iface
+fail_impl ..|> repo_iface
+
+service ..> entity : usa reglas de dominio
+pdo_impl --> db : PDO preparado
+
+@enduml

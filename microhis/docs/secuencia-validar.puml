@@ -1,0 +1,31 @@
+@startuml
+title Micro-HIS ASII-20 — Secuencia validar resultado (CU-03 + CU-05)
+
+skinparam defaultFontSize 13
+
+actor Bioquimico
+participant "Presentation\n(public/index.php)" as pres
+participant "Application\nBioquimicoValidationService" as service
+participant "Domain\nLabResult" as entity
+participant "Persistence\nPdoLabResultRepository" as repo
+database "SQLite" as db
+participant "CriticalAlertNotifier" as alerts
+
+Bioquimico -> pres : POST /lab/results/{id}/validate\n(X-Role: bioquimico)
+pres -> service : validate(id, usuario, rol)
+service -> service : assertBioquimico(rol) → 403 si no
+service -> repo : findById(id)
+repo -> db : SELECT (preparada)
+repo --> service : LabResult pendiente
+service -> entity : validate(usuario, fecha)
+entity -> entity : assertNotValidated() → 409 si ya validado
+entity --> service : estado resultado_listo
+service -> repo : save(result)
+repo -> db : UPDATE (preparada)
+alt si is_critical
+    service -> alerts : emit(result)
+    alerts --> service : alerta crítica registrada (CU-05)
+end
+service --> pres : 200 JSON (resultado)
+pres --> Bioquimico : respuesta JSON
+@enduml
