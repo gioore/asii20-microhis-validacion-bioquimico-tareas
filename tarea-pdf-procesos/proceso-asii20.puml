@@ -1,0 +1,60 @@
+@startuml
+title Diagrama de procesos — Módulo ASII-20 (Validación de resultados por bioquímico)
+
+|Bioquímico|
+start
+:Consulta resultados pendientes de validación;
+
+|Sistema|
+if (¿Existen resultados sin validar?) then (No)
+  :Muestra "sin resultados pendientes";
+  stop
+else (Sí)
+
+|Bioquímico|
+  :Selecciona un resultado;
+  :Revisa valor vs rangos de referencia;
+  if (¿Valor supera umbral crítico?) then (Sí)
+    :Confirma criticalidad\ny solicita escalamiento;
+  elseif (¿Valor fuera de rango)? then (Sí)
+    :Marca flag is_anormal;
+  endif
+
+  if (¿Se aprueba el resultado?) then (Sí)
+  else (No / Rechazo)
+    :Solicita motivo del rechazo;
+    |Sistema|
+    if (¿Motivo proporcionado?) then (Sí)
+      :Registra rechazo con motivo;
+      :Notifica al técnico de laboratorio;
+      |Técnico de Laboratorio|
+      :Corrige el resultado;
+      :Regresa a pendiente;
+      |Bioquímico|
+      :Revalida resultado corregido (CU-08);
+    else (No)
+      :EXCEPCIÓN: motivo obligatorio\n(rechazo inválido - HTTP 422);
+      stop
+    endif
+  endif
+
+  |Sistema|
+  if (¿Revalidado o validado?) then (Sí)
+    :Registra validación\n(validated_by, validated_at);
+    :Actualiza item a resultado_listo;
+    if (¿Valor crítico confirmado?) then (Sí)
+      :Genera alerta crítica\n(critical_alerts);
+      |Sistema de Alertas / Médico|
+      :Notifica valor crítico al médico;
+    endif
+    |Sistema|
+    :Publica resultado al EMR\n(sent_to_emr);
+    :Resultado disponible para el médico;
+  endif
+  if (¿Hay más resultados pendientes?) then (Sí)
+    :Volver a consulta de pendientes;
+  else (No)
+    stop
+  endif
+endif
+@enduml

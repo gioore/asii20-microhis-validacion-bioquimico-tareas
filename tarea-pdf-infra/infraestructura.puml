@@ -1,0 +1,59 @@
+@startuml
+title Infraestructura de red y servidores — Sistema Hospitalario Integrado (HIS)
+
+!define DB = database
+
+skinparam componentStyle rectangle
+skinparam monochrome false
+
+package "Internet" {
+  actor "Bioquímico" as bio
+  actor "Técnico de Laboratorio" as tec
+  actor "Médico" as med
+}
+
+package "DMZ" {
+  [Firewall\n(perimetral)] as fw
+  [Balanceador de carga\n(HAProxy/nginx)] as lb
+  [Servidor Web / Frontend\n(Vue 3 + Vite/nginx)] as web
+  [Servidor API\n(Laravel 12 + PHP 8.2+\nJWT + RBAC + Tenant)] as api
+}
+
+package "Red interna" {
+  database "Servidor MySQL\n(principal)" as dbp
+  database "Servidor MySQL\n(réplica respaldo)" as dbr
+  [Servidor EMR / Expediente] as emr
+  [Servicio de Notificaciones\n(mail / eventos)] as notif
+  [Servidor de Respaldos\n(backup diario)] as backup
+  [Monitoreo\n(Grafana/Logs)] as mon
+}
+
+bio --> fw
+tec --> fw
+med --> fw
+
+fw --> lb
+lb --> web
+lb --> api
+
+web --> api : HTTPS / JSON (Axios)
+
+api --> dbp : PDO / SQL (lectura/escritura)
+dbp <--> dbr : replicación maestro-esclavo
+dbr --> backup : volcado diario
+api --> emr : publica resultado validado (sent_to_emr)
+api --> notif : alerta crítica / notificación
+notif --> med : alerta de valor crítico
+
+mon --> api
+mon --> dbp
+mon --> web
+
+note right of fw
+  Seguridad: HTTPS/TLS,
+  JWT, RBAC (Spatie),
+  tenant por X-Tenant-ID,
+  datos clínicos sensibles.
+end note
+
+@enduml

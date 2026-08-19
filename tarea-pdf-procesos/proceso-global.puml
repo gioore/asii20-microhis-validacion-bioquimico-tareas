@@ -1,0 +1,58 @@
+@startuml
+title Diagrama GLOBAL de procesos — Sistema Hospitalario Integrado (HIS)
+
+skinparam activityDiamondFontSize 12
+skinparam backgroundColor #FEFEFE
+
+|Transversal|
+start
+:Registro de usuarios y tenants\n(módulo 1);
+:RBAC: roles y permisos\n(módulo 2);
+:Registro de paciente\n(módulo 3);
+:Registro de médico y especialidad\n(módulo 4);
+
+|Asistencial|
+:Registro de cita médica\n(módulo 5);
+:Admisión hospitalaria y\nasignación de cama (módulos 6-7);
+
+if (¿Requiere estudios de laboratorio?) then (Sí)
+  :Orden de laboratorio desde EMR\n(módulo 16);
+  :Catálogo de pruebas\n(módulo 17);
+  :Recepción de muestra y código\n(módulo 18);
+  :Ingreso de resultados\n(módulo 19);
+
+  |Bioquímico|
+  #LightBlue:**VALIDACIÓN DE RESULTADOS POR\nBIOQUÍMICO (MÓDULO ASII-20)**;
+  note right
+    El bioquímico revisa, valida o
+    rechaza cada resultado. Resaltado
+    como módulo asignado.
+  end note
+  if (¿Resultado validado?) then (Sí)
+    :Publicación al EMR\n(sent_to_emr);
+    :Alerta crítica y notificaciones\n(módulo 21);
+  else (No / rechazado)
+    :Corrección del técnico y\nrevalidación (CU-08);
+    :Volver a validación bioquímico;
+  endif
+else (No)
+endif
+
+|Asistencial|
+:Expediente médico electrónico\n(EMR - módulo 10);
+:Notas SOAP y diagnósticos\n(módulo 11);
+:Alergias y alerta visual\n(módulo 12);
+:Signos vitales y umbrales\n(módulo 13);
+:Prescripciones y validación de alergias\n(módulos 14-15);
+:Traslados, alta y liberación de cama\n(módulo 8);
+:Dashboard de ocupación hospitalaria\n(módulo 9);
+
+|Transversal|
+:Reportes y analytics\n(módulos 23, 27);
+:Gobernanza y auditoría\n(módulo 22);
+:Dashboard base UI/UX\n(módulo 26);
+:Contratos API / documentación\n(módulo 24);
+:QA / pruebas E2E / CI\n(módulos 25, 28);
+:Prototipo NativePHP\n(módulo 29);
+stop
+@enduml
