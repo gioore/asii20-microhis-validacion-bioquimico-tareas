@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resultados de laboratorio | ASII-20</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
+    body { margin: 0; } main { max-width: 1100px; margin: auto; padding: 2rem 1rem; }
+    header { display: flex; justify-content: space-between; align-items: start; gap: 1rem; margin-bottom: 1rem; }
+    h1 { margin: 0; } p { color: #526078; } .badge { background: #dbeafe; color: #1e40af; padding: .4rem .7rem; border-radius: 999px; }
+    .toolbar, .card { background: #fff; border: 1px solid #d9e0ec; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+    .toolbar { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; } select, button, textarea { font: inherit; padding: .55rem .7rem; border: 1px solid #9aa8bd; border-radius: 7px; }
+    button { cursor: pointer; background: #fff; } .primary { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+    table { width: 100%; border-collapse: collapse; } th, td { text-align: left; padding: .8rem; border-bottom: 1px solid #edf0f5; } th { font-size: .8rem; text-transform: uppercase; color: #526078; }
+    .grid { display: grid; grid-template-columns: 1fr 300px; gap: 1rem; } .detail dl { display: grid; gap: .7rem; } dt { color: #68758b; font-size: .8rem; } dd { margin: .1rem 0 0; font-weight: 700; }
+    .critical { color: #a11b1b; font-weight: 700; } .notice { padding: .7rem; background: #dcfce7; color: #166534; border-radius: 7px; } .empty { padding: 1rem; text-align: center; }
+    dialog { border: 0; border-radius: 10px; max-width: 450px; box-shadow: 0 20px 40px #17203355; } dialog::backdrop { background: #17203388; } dialog menu { display: flex; justify-content: end; gap: .5rem; padding: 0; } textarea { width: 100%; box-sizing: border-box; }
+    @media (max-width: 760px) { header, .grid { display: block; } .badge { display: inline-block; margin-top: .8rem; } table { display: block; overflow-x: auto; white-space: nowrap; } .detail { margin-top: 1rem; } }
+  </style>
+</head>
+<body>
+<main>
+  <header><div><p>ASII-20 / LABORATORIO</p><h1>Resultados pendientes</h1><p>Revisa y valida resultados del hospital.</p></div><span class="badge">Demo local</span></header>
+  <div class="toolbar"><label for="priority">Prioridad</label><select id="priority"><option value="all">Todas</option><option value="alta">Alta</option><option value="critica">Critica</option></select><button id="clear" type="button">Limpiar filtros</button></div>
+  <p id="notice" class="notice" role="status" hidden></p>
+  <div class="grid"><section class="card"><div id="state" role="status">Cargando resultados...</div><table id="results" hidden><thead><tr><th>Paciente</th><th>Prueba</th><th>Resultado</th><th>Prioridad</th><th>Accion</th></tr></thead><tbody></tbody></table></section><aside id="detail" class="card detail" hidden></aside></div>
+</main>
+<dialog id="reject-dialog"><form method="dialog" id="reject-form"><h2>Rechazar resultado</h2><p>El motivo se registra para el tecnico.</p><label for="reason">Motivo</label><textarea id="reason" maxlength="500" rows="4" required></textarea><small id="counter">0/500</small><menu><button value="cancel">Cancelar</button><button class="primary" value="confirm">Confirmar rechazo</button></menu></form></dialog>
+<script>
+const state = { all: [], selected: null };
+const $ = (id) => document.getElementById(id);
+const demo = [{ id: 1, patient: 'PAC-0001', test: 'Glucosa', value: '118', unit: 'mg/dL', priority: 'Alta', critical: false }, { id: 2, patient: 'PAC-0002', test: 'Hemoglobina', value: '7.8', unit: 'g/dL', priority: 'Critica', critical: true }];
+async function load() { try { const response = await fetch('/lab/results/pending', { headers: { 'X-Tenant-Id': 'hospital-demo' } }); const data = await response.json(); state.all = data.pending ?? demo; } catch { state.all = demo; } render(); }
+function visible() { const filter = $('priority').value; return state.all.filter((result) => filter === 'all' || result.priority.toLowerCase() === filter); }
+function render() { const rows = visible(); $('state').hidden = rows.length > 0; $('state').textContent = rows.length ? '' : 'No hay resultados que coincidan con el filtro.'; $('results').hidden = !rows.length; $('results').querySelector('tbody').innerHTML = rows.map((r) => `<tr><td>${r.patient}</td><td>${r.test}</td><td>${r.value} ${r.unit}</td><td class="${r.critical ? 'critical' : ''}">${r.priority}${r.critical ? ' (critico)' : ''}</td><td><button type="button" data-id="${r.id}">Ver detalle</button></td></tr>`).join(''); }
+function showDetail(id) { state.selected = state.all.find((result) => String(result.id) === String(id)); const r = state.selected; $('detail').hidden = !r; if (r) $('detail').innerHTML = `<h2>${r.test}</h2><p>${r.patient}</p><dl><div><dt>Resultado</dt><dd>${r.value} ${r.unit}</dd></div><div><dt>Prioridad</dt><dd>${r.priority}</dd></div></dl>${r.critical ? '<p class="critical" role="alert">Valor critico: confirmar antes de validar.</p>' : ''}<button class="primary" id="validate" type="button">Validar</button> <button id="reject" type="button">Rechazar</button>`; $('validate')?.addEventListener('click', () => action('validate')); $('reject')?.addEventListener('click', () => $('reject-dialog').showModal()); }
+async function action(type, reason = '') { const r = state.selected; try { await fetch(`/lab/results/${r.id}/${type}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Tenant-Id': 'hospital-demo' }, body: JSON.stringify({ reason }) }); } catch {} state.all = state.all.filter((item) => item.id !== r.id); state.selected = null; $('detail').hidden = true; $('notice').hidden = false; $('notice').textContent = `Resultado ${r.id} ${type === 'validate' ? 'validado' : 'rechazado'} correctamente.`; render(); }
+$('priority').addEventListener('change', render); $('clear').addEventListener('click', () => { $('priority').value = 'all'; render(); }); $('results').addEventListener('click', (event) => { if (event.target.dataset.id) showDetail(event.target.dataset.id); }); $('reason').addEventListener('input', () => $('counter').textContent = `${$('reason').value.length}/500`); $('reject-form').addEventListener('submit', (event) => { if ($('reject-form').returnValue === 'confirm') { event.preventDefault(); const reason = $('reason').value.trim(); if (reason) { $('reject-dialog').close(); action('reject', reason); } } }); load();
+</script>
+</body></html>
