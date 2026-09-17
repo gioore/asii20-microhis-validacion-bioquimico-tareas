@@ -33,6 +33,12 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $path   = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $path   = rtrim((string) $path, '/');
 
+if ($path === '/dashboard.html' && $method === 'GET') {
+    header('Content-Type: text/html; charset=utf-8');
+    readfile(__DIR__ . '/dashboard.html');
+    exit;
+}
+
 // Identidad simulada para la demo (datos ficticios).
 $user = $_SERVER['HTTP_X_USER'] ?? 'bioquimico-demo';
 $role = $_SERVER['HTTP_X_ROLE'] ?? 'bioquimico';
