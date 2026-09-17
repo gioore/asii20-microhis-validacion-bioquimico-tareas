@@ -18,6 +18,10 @@ Repositorio personal de **GERSON GIOVANNI ORELLANA VÉLIZ** (`gioore`), módulo 
 | `tarea2-solid/` | T2 | Ejemplo DIP + RF/RNF + documento |
 | `microhis/` | T3 y T4 | Microproyecto PHP 8.2+ vanilla (capas; después MVC + Repository) |
 
+## Evidencia semanal
+
+- [Semana 6 - evaluación parcial](./docs/semana-06-evaluacion-parcial.md)
+
 ## Configuración
 
 Todos los datos usados son **ficticios** y sin información clínica identificable.
