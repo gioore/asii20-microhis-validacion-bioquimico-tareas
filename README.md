@@ -18,6 +18,11 @@ Repositorio personal de **GERSON GIOVANNI ORELLANA VÉLIZ** (`gioore`), módulo 
 | `tarea2-solid/` | T2 | Ejemplo DIP + RF/RNF + documento |
 | `microhis/` | T3 y T4 | Microproyecto PHP 8.2+ vanilla (capas; después MVC + Repository) |
 
+## Evidencia semanal
+
+- [Semana 5 - contrato API e integración](./docs/semana-05-contrato-api-integracion.md)
+- Diagrama editable: `microhis/docs/integracion-semana-05.puml`
+
 ## Configuración
 
 Todos los datos usados son **ficticios** y sin información clínica identificable.
