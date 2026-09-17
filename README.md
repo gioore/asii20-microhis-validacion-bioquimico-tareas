@@ -23,6 +23,9 @@ Repositorio personal de **GERSON GIOVANNI ORELLANA VÉLIZ** (`gioore`), módulo 
 - [Semana 5 - contrato API e integración](./docs/semana-05-contrato-api-integracion.md)
 - Diagrama editable: `microhis/docs/integracion-semana-05.puml`
 - [Semana 6 - evaluación parcial](./docs/semana-06-evaluacion-parcial.md)
+- [Semana 7 - componentes y refactorización](./docs/semana-07-componentes-refactorizacion.md)
+- [Semana 8 - flujo UX](./docs/semana-08-flujo-ux.md)
+- Dashboard funcional: `microhis/public/dashboard.html`
 
 ## Configuración
 
