@@ -20,6 +20,8 @@ Repositorio personal de **GERSON GIOVANNI ORELLANA VÉLIZ** (`gioore`), módulo 
 
 ## Evidencia semanal
 
+- [Semana 5 - contrato API e integración](./docs/semana-05-contrato-api-integracion.md)
+- Diagrama editable: `microhis/docs/integracion-semana-05.puml`
 - [Semana 6 - evaluación parcial](./docs/semana-06-evaluacion-parcial.md)
 
 ## Configuración

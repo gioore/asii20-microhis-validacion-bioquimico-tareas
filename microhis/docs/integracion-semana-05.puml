@@ -1,0 +1,16 @@
+@startuml
+title ASII-20 - Semana 5: integracion personal
+actor Bioquimico
+rectangle "Dashboard HTML" as ui
+rectangle "PHP HTTP API" as api
+rectangle "BioquimicoValidationService" as service
+rectangle "Repository PDO" as repo
+rectangle "Alertas y notificacion" as notifications
+database "SQLite" as db
+Bioquimico --> ui
+ui --> api : JSON + X-Tenant-Id
+api --> service
+service --> repo
+repo --> db
+service --> notifications
+@enduml
