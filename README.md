@@ -18,6 +18,12 @@ Repositorio personal de **GERSON GIOVANNI ORELLANA VÉLIZ** (`gioore`), módulo 
 | `tarea2-solid/` | T2 | Ejemplo DIP + RF/RNF + documento |
 | `microhis/` | T3 y T4 | Microproyecto PHP 8.2+ vanilla (capas; después MVC + Repository) |
 
+## Evidencia semanal
+
+- [Semana 7 - componentes y refactorización](./docs/semana-07-componentes-refactorizacion.md)
+- [Semana 8 - flujo UX](./docs/semana-08-flujo-ux.md)
+- Dashboard funcional: `microhis/public/dashboard.html`
+
 ## Configuración
 
 Todos los datos usados son **ficticios** y sin información clínica identificable.
