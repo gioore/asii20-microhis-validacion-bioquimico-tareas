@@ -25,6 +25,9 @@ Repositorio personal de **GERSON GIOVANNI ORELLANA VÉLIZ** (`gioore`), módulo 
 - [Semana 6 - evaluación parcial](./docs/semana-06-evaluacion-parcial.md)
 - [Semana 7 - componentes y refactorización](./docs/semana-07-componentes-refactorizacion.md)
 - [Semana 8 - flujo UX](./docs/semana-08-flujo-ux.md)
+- [Semana 9 - usabilidad y accesibilidad](./docs/semana-09-usabilidad-accesibilidad.md)
+- [Semana 10 - diseño para movilidad](./docs/semana-10-diseno-movilidad.md)
+- [Semana 11 - prototipo navegable](./docs/semana-11-prototipo-navegable.md)
 - Dashboard funcional: `microhis/public/dashboard.html`
 
 ## Configuración
